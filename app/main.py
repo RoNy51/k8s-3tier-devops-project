@@ -1,10 +1,16 @@
 import os
 import psycopg2
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="app/templates")
 
 # --- Config read from environment (populated via ConfigMap + Secret in K8s) ---
@@ -40,11 +46,6 @@ def init_db():
     conn.close()
 
 
-@app.on_event("startup")
-def startup_event():
-    init_db()
-
-
 @app.get("/healthz")
 def healthz():
     return {"status": "ok"}
@@ -68,7 +69,7 @@ def form_page(request: Request):
     rows = cur.fetchall()
     cur.close()
     conn.close()
-    return templates.TemplateResponse("index.html", {"request": request, "messages": rows, "db_host": DB_HOST})
+    return templates.TemplateResponse(request, "index.html", {"messages": rows, "db_host": DB_HOST})
 
 
 @app.post("/submit")
