@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3-Tier Demo App</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        input[type=text] { width: 70%; padding: 8px; }
+        button { padding: 8px 16px; }
+        ul { padding-left: 20px; }
+        .meta { color: #666; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <h1>3-Tier App Demo</h1>
+    <p class="meta">Connected to DB host: {{ db_host }}</p>
+
+    <form action="/submit" method="post">
+        <input type="text" name="content" placeholder="Enter a message" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Last 10 messages</h2>
+    <ul>
+        {% for msg in messages %}
+        <li>{{ msg[1] }} <span class="meta">({{ msg[2] }})</span></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
