@@ -80,13 +80,20 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+                            stage('Deploy') {
             steps {
-                echo "Image pushed: ${ECR_URI}:${IMAGE_TAG}"
-                echo "Deploy stage placeholder — ArgoCD sync wiring comes next session"
+                withCredentials([usernamePassword(credentialsId: 'github-pat-write', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    sh """
+                        sed -i "s|image: .*|image: ${ECR_URI}:${IMAGE_TAG}|" k8s-manifests/base/04-app-deployment.yaml
+                        git config user.email "jenkins-ci@3tier-app.local"
+                        git config user.name "jenkins-ci"
+                        git add k8s-manifests/base/04-app-deployment.yaml
+                        git commit -m "Deploy: update image tag to ${IMAGE_TAG} [ci skip]"
+                        git push https://${GIT_USER}:${GIT_TOKEN}@github.com/RoNy51/k8s-3tier-devops-project.git HEAD:main
+                    """
+                }
             }
         }
-    }
 
     post {
         always {
