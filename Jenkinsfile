@@ -90,7 +90,7 @@ pipeline {
 
     post {
         always {
-            sh "docker rmi ${ECR_REPO}:${IMAGE_TAG} || true"
+            sh "docker rmi ${env.ECR_REPO}:${env.IMAGE_TAG} || true"
         }
         success {
             echo "Pipeline succeeded for build #${env.BUILD_NUMBER}"
