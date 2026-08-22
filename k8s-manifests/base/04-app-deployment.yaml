@@ -13,6 +13,8 @@ spec:
       labels:
         app: three-tier-app
     spec:
+      imagePullSecrets:
+        - name: ecr-pull-secret
       containers:
         - name: app
           image: 471597061700.dkr.ecr.eu-west-1.amazonaws.com/3tier-app:latest
